@@ -60,6 +60,7 @@ public class OrderPayload
 public class OrderResponse
 {
     // Returns the HTTP response to the Webshop
+    [HttpResult]
     public HttpResponseData HttpResponse { get; set; } = null!;
 
     // Drops the payload into the Service Bus Queue
