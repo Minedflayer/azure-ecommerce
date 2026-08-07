@@ -70,9 +70,11 @@ jobs:
       - name: Deploy Bicep template
         uses: azure/arm-deploy@v2
         with:
-          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           resourceGroupName: ${{ env.RESOURCE_GROUP }}
           template: ${{ env.BICEP_FILE_PATH }}
+          parameters: >-
+            sqlAdminLogin=${{ secrets.SQL_ADMIN_LOGIN }}
+            sqlAdminPassword=${{ secrets.SQL_ADMIN_PASSWORD }}
           failOnStdErr: false
 
   deploy-functions:
