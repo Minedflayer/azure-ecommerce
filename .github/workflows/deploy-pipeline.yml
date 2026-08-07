@@ -12,7 +12,7 @@ env:
   WMS_API_NAME: 'ecom52ekuuuicvepu-wms-api'
   ORDER_API_PATH: './src/api/OrderApi'
   WMS_API_PATH: './src/api/WmsApi'
-  BICEP_FILE_PATH: './infra/main.bicep' # Adjust if your Bicep file is located elsewhere or named differently
+  BICEP_FILE_PATH: './infra/main.bicep'
 
 jobs:
   build-and-test:
@@ -110,5 +110,3 @@ jobs:
         with:
           app-name: ${{ env.WMS_API_NAME }}
           package: ./publish/WmsApi
-
-
