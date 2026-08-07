@@ -4,6 +4,13 @@ param location string = resourceGroup().location
 @description('Short prefix for resources to maintain naming length limits.')
 param prefix string = 'ecom'
 
+// Secure parameters (never hardcode defaults for these)
+@secure()
+param sqlAdminLogin string
+
+@secure()
+param sqlAdminPassword string
+
 // Create a 13-character unique hash based on the resource group
 var uniqueSeed = uniqueString(resourceGroup().id) 
 var baseName = '${prefix}${uniqueSeed}' // Total: 17 characters
@@ -90,8 +97,8 @@ resource sqlServer 'Microsoft.Sql/servers@2022-05-01-preview' = {
   name: '${baseName}-sqlserver'
   location: location
   properties: {
-    administratorLogin: 'dbadmin'
-    administratorLoginPassword: 'Password12345!' // In production, use a secure parameter/Key Vault
+    administratorLogin: sqlAdminLogin
+    administratorLoginPassword: sqlAdminPassword
   }
 }
 
