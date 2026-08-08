@@ -48,9 +48,10 @@ namespace OrderApi.Tests
             Assert.NotNull(result);
             Assert.NotNull(result.HttpResponse);
             Assert.Equal(HttpStatusCode.Accepted, result.HttpResponse.StatusCode);
-            
-            // Verify that no message is queued for the Service Bus
-            Assert.Null(result.ServiceBusMessage);
+
+            // Verify that the message IS queued for the Service Bus
+            Assert.NotNull(result.ServiceBusMessage);
+            Assert.Contains("ORD-12345", result.ServiceBusMessage);
 
             // Temporary placeholder assertion to ensure the test runner works
             Assert.True(true);
@@ -63,19 +64,19 @@ namespace OrderApi.Tests
 
             var services = new ServiceCollection();
             services.AddOptions(); // Required for JSON serialization options
-            
+
             // Add the specific WorkerOptions the isolated framework requires for JSON parsing
-    services.Configure<WorkerOptions>(workerOptions =>
-    {
-        workerOptions.Serializer = new JsonObjectSerializer(
-            new JsonSerializerOptions
+            services.Configure<WorkerOptions>(workerOptions =>
             {
-                PropertyNameCaseInsensitive = true
-            }
-        );
-    });
-            
-            
+                workerOptions.Serializer = new JsonObjectSerializer(
+                    new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    }
+                );
+            });
+
+
             var serviceProvider = services.BuildServiceProvider();
 
             mockContext.SetupProperty(c => c.InstanceServices, serviceProvider);
@@ -99,7 +100,7 @@ namespace OrderApi.Tests
             // Link CreateResponse to return Mocked Response
             mockRequest.Setup(r => r.CreateResponse()).Returns(mockResponse.Object);
 
-           
+
             return (mockRequest, mockResponse);
         }
     }
