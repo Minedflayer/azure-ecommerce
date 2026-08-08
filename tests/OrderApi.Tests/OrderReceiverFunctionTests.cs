@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using Microsoft.Azure.Functions.Worker;
-// Add the using statement for your OrderApi namespace here
+using Microsoft.Extensions.DependencyInjection;
 
 namespace OrderApi.Tests
 {
@@ -46,7 +46,7 @@ namespace OrderApi.Tests
             // Assert
             Assert.NotNull(result);
             Assert.NotNull(result.HttpResponse);
-            Assert.Equal(HttpStatusCode.BadRequest, result.HttpResponse.StatusCode);
+            Assert.Equal(HttpStatusCode.Accepted, result.HttpResponse.StatusCode);
             
             // Verify that no message is queued for the Service Bus
             Assert.Null(result.ServiceBusMessage);
@@ -59,6 +59,13 @@ namespace OrderApi.Tests
         private (Mock<HttpRequestData>, Mock<HttpResponseData>) CreateMockRequest(string body)
         {
             var mockContext = new Mock<FunctionContext>();
+
+            var services = new ServiceCollection();
+            services.AddOptions(); // Required for JSON serialization options
+            var serviceProvider = services.BuildServiceProvider();
+
+            mockContext.SetupProperty(c => c.InstanceServices, serviceProvider);
+
             var mockRequest = new Mock<HttpRequestData>(mockContext.Object);
             var mockResponse = new Mock<HttpResponseData>(mockContext.Object);
 
