@@ -33,8 +33,8 @@ jobs:
       - name: Build WMS API
         run: dotnet build ${{ env.WMS_API_PATH }} --configuration Release
 
-    #   - name: Run Unit Tests
-    #     run: dotnet test --no-build --configuration Release
+      - name: Run Unit Tests
+        run: dotnet test --no-build --configuration Release
 
       - name: Publish Order API
         run: dotnet publish ${{ env.ORDER_API_PATH }} --configuration Release --output ./publish/OrderApi
