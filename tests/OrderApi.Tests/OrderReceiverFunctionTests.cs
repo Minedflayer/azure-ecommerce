@@ -8,6 +8,7 @@ using Moq;
 using Xunit;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
+using Azure.Core.Serialization;
 
 namespace OrderApi.Tests
 {
@@ -62,6 +63,19 @@ namespace OrderApi.Tests
 
             var services = new ServiceCollection();
             services.AddOptions(); // Required for JSON serialization options
+            
+            // Add the specific WorkerOptions the isolated framework requires for JSON parsing
+    services.Configure<WorkerOptions>(workerOptions =>
+    {
+        workerOptions.Serializer = new JsonObjectSerializer(
+            new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            }
+        );
+    });
+            
+            
             var serviceProvider = services.BuildServiceProvider();
 
             mockContext.SetupProperty(c => c.InstanceServices, serviceProvider);

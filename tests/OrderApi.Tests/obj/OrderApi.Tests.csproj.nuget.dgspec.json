@@ -1,7 +1,7 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\tests\\OrderApi.Tests\\OrderApi.Tests.csproj": {}
+    "c:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\tests\\OrderApi.Tests\\OrderApi.Tests.csproj": {}
   },
   "projects": {
     "C:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\src\\api\\OrderApi\\OrderApi.csproj": {
@@ -122,14 +122,14 @@
         }
       }
     },
-    "C:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\tests\\OrderApi.Tests\\OrderApi.Tests.csproj": {
+    "c:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\tests\\OrderApi.Tests\\OrderApi.Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\tests\\OrderApi.Tests\\OrderApi.Tests.csproj",
+        "projectUniqueName": "c:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\tests\\OrderApi.Tests\\OrderApi.Tests.csproj",
         "projectName": "OrderApi.Tests",
-        "projectPath": "C:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\tests\\OrderApi.Tests\\OrderApi.Tests.csproj",
+        "projectPath": "c:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\tests\\OrderApi.Tests\\OrderApi.Tests.csproj",
         "packagesPath": "C:\\Users\\Victor Tell\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\tests\\OrderApi.Tests\\obj\\",
+        "outputPath": "c:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\tests\\OrderApi.Tests\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -174,6 +174,10 @@
           "framework": "net10.0",
           "targetAlias": "net10.0",
           "dependencies": {
+            "Azure.Core": {
+              "target": "Package",
+              "version": "[1.61.0, )"
+            },
             "Microsoft.Azure.Functions.Worker": {
               "target": "Package",
               "version": "[2.52.0, )"
