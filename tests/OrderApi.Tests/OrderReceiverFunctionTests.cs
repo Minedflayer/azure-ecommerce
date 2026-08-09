@@ -29,7 +29,7 @@ namespace OrderApi.Tests
         [Fact]
         public async Task OrderReceiverFunction_ValidPayload_ReturnsAcceptedAndQueuesMessage()
         {
-            // Arrange
+           
             // Set up a mock HTTP request or payload here depending on your trigger setup
             var validOrder = new OrderPayload
             {
@@ -44,7 +44,7 @@ namespace OrderApi.Tests
 
             var result = await _sut.Run(mockRequest.Object);
 
-            // Assert
+            
             Assert.NotNull(result);
             Assert.NotNull(result.HttpResponse);
             Assert.Equal(HttpStatusCode.Accepted, result.HttpResponse.StatusCode);
@@ -84,11 +84,11 @@ namespace OrderApi.Tests
             var mockRequest = new Mock<HttpRequestData>(mockContext.Object);
             var mockResponse = new Mock<HttpResponseData>(mockContext.Object);
 
-            // Mock the Request Body
+            // Request Body
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(body));
             mockRequest.Setup(r => r.Body).Returns(stream);
 
-            // Mock the Response Body and Properties
+            // Response Body
             var responseStream = new MemoryStream();
             mockResponse.Setup(r => r.Body).Returns(responseStream);
             mockResponse.SetupProperty(r => r.StatusCode);
