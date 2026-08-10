@@ -26,7 +26,7 @@ namespace WmsApi.Tests
         public async Task DeliveryReceiverFunction_ValidPayload_ReturnsOkWithSuccessResponseBody()
         {
             // Arrange
-            string validPayload = "{\"OrderId\":\"ORD-CLOUD-1002\",\"CustomerEmail\":\"victor@example.com\",\"TotalAmount\":299.99}";
+            string validPayload = "{\"OrderId\":\"ORD-CLOUD-1005\",\"CustomerEmail\":\"victor@example.com\",\"TotalAmount\":299.99}";
             var (mockRequest, mockResponse) = CreateMockRequest(validPayload);
 
             // Act
