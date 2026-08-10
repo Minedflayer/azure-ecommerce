@@ -34,9 +34,6 @@ jobs:
         run: dotnet build ${{ env.WMS_API_PATH }} --configuration Release
 
       - name: Run Unit Tests
-        run: dotnet test tests/**/*.csproj --configuration Release
-
-      - name: Run Unit Tests
         run: |
           dotnet test ./tests/OrderApi.Tests/OrderApi.Tests.csproj --configuration Release
           dotnet test ./tests/WmsApi.Tests/WmsApi.Tests.csproj --configuration Release
