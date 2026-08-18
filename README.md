@@ -10,7 +10,9 @@ An event-driven integration application designed to process e-commerce orders, r
 *   **WMS API (Azure Function):** Receives delivery processing requests from the Logic App and finalizes the warehouse synchronization.
 *   **Data Store (Azure SQL Database):** Maintains records of customers and orders using idempotent `UPSERT` logic.
 
-![Description](images\architechture.png)
+<p align="center">
+  <img src="images/architechture.png" alt="Architecture Overview" />
+</p>
 
 ## Technology Stack
 
