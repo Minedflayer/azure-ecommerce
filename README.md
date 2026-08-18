@@ -1,6 +1,6 @@
 # E-Commerce Integration Pipeline
 
-An event-driven integration application designed to process e-commerce orders, route messages securely through cloud infrastructure, and synchronize data with a Warehouse Management System (WMS).
+An event-driven integration application designed to process e-commerce orders, route messages securely through cloud infrastructure, and synchronize data with a Warehouse Management System (WMS). The application serves the purpose of acquiring a basic understanding of event-driven applications in Azure.
 
 ## Architecture Overview
 
