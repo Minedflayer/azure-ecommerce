@@ -1,8 +1,0 @@
-C:\Users\Victor Tell\repos\NET-projects\ecommerce-integration\tests\OrderApi.Tests\bin\Debug\net10.0\.msCoverageSourceRootsMapping_OrderApi.Tests
-C:\Users\Victor Tell\repos\NET-projects\ecommerce-integration\tests\OrderApi.Tests\bin\Debug\net10.0\CoverletSourceRootsMapping_OrderApi.Tests
-C:\Users\Victor Tell\repos\NET-projects\ecommerce-integration\tests\OrderApi.Tests\obj\Debug\net10.0\OrderApi.Tests.csproj.AssemblyReference.cache
-C:\Users\Victor Tell\repos\NET-projects\ecommerce-integration\tests\OrderApi.Tests\obj\Debug\net10.0\OrderApi.Tests.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\Victor Tell\repos\NET-projects\ecommerce-integration\tests\OrderApi.Tests\obj\Debug\net10.0\OrderApi.Tests.AssemblyInfoInputs.cache
-C:\Users\Victor Tell\repos\NET-projects\ecommerce-integration\tests\OrderApi.Tests\obj\Debug\net10.0\OrderApi.Tests.AssemblyInfo.cs
-C:\Users\Victor Tell\repos\NET-projects\ecommerce-integration\tests\OrderApi.Tests\obj\Debug\net10.0\OrderApi.Tests.csproj.CoreCompileInputs.cache
-C:\Users\Victor Tell\repos\NET-projects\ecommerce-integration\tests\OrderApi.Tests\obj\Debug\net10.0\OrderApi.Tests.sourcelink.json

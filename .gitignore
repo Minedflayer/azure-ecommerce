@@ -1,0 +1,24 @@
+# Build results and compiled binaries
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Tt]est[Rr]esults/
+
+# Azure Functions local settings & secrets
+local.settings.json
+*.secret.json
+
+# Visual Studio / VS Code workspace overrides
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.vs/
+
+# Bicep and deployment temp files
+*.biceparm.json
+
+# OS generated files
+.DS_Store
+Thumbs.db
