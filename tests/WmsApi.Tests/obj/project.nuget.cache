@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "xVtakFNP+e4=",
+  "dgSpecHash": "5QxCm6jWw9k=",
   "success": true,
-  "projectFilePath": "c:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\tests\\WmsApi.Tests\\WmsApi.Tests.csproj",
+  "projectFilePath": "C:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\tests\\WmsApi.Tests\\WmsApi.Tests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Victor Tell\\.nuget\\packages\\azure.core\\1.61.0\\azure.core.1.61.0.nupkg.sha512",
     "C:\\Users\\Victor Tell\\.nuget\\packages\\azure.monitor.opentelemetry.exporter\\1.7.0\\azure.monitor.opentelemetry.exporter.1.7.0.nupkg.sha512",

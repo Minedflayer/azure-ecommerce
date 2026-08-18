@@ -1,7 +1,7 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\tests\\WmsApi.Tests\\WmsApi.Tests.csproj": {}
+    "C:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\tests\\WmsApi.Tests\\WmsApi.Tests.csproj": {}
   },
   "projects": {
     "C:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\src\\api\\WmsApi\\WmsApi.csproj": {
@@ -514,14 +514,14 @@
         }
       }
     },
-    "c:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\tests\\WmsApi.Tests\\WmsApi.Tests.csproj": {
+    "C:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\tests\\WmsApi.Tests\\WmsApi.Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\tests\\WmsApi.Tests\\WmsApi.Tests.csproj",
+        "projectUniqueName": "C:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\tests\\WmsApi.Tests\\WmsApi.Tests.csproj",
         "projectName": "WmsApi.Tests",
-        "projectPath": "c:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\tests\\WmsApi.Tests\\WmsApi.Tests.csproj",
+        "projectPath": "C:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\tests\\WmsApi.Tests\\WmsApi.Tests.csproj",
         "packagesPath": "C:\\Users\\Victor Tell\\.nuget\\packages\\",
-        "outputPath": "c:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\tests\\WmsApi.Tests\\obj\\",
+        "outputPath": "C:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\tests\\WmsApi.Tests\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
