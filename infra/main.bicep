@@ -4,24 +4,55 @@ param location string = resourceGroup().location
 @description('Short prefix for resources to maintain naming length limits.')
 param prefix string = 'ecom'
 
+@secure()
+param sqlAdminLogin string
+
+@secure()
+param sqlAdminPassword string
+
 // Create a 13-character unique hash based on the resource group
 var uniqueSeed = uniqueString(resourceGroup().id) 
 var baseName = '${prefix}${uniqueSeed}' // Total: 17 characters
 
-// Service Bus Namespace (Changed suffix from '-sb' to 'ns' to avoid reserved suffix error)
+// Service Bus Namespace
 resource serviceBusNamespace 'Microsoft.ServiceBus/namespaces@2022-01-01-preview' = {
-    name: '${baseName}ns'
-    location: location
-    sku: {
-        name: 'Basic'
-        tier: 'Basic'
-    }
+  name: '${baseName}ns'
+  location: location
+  sku: {
+    name: 'Standard' 
+    tier: 'Standard'
+  }
 }
 
-resource serviceBusQueue 'Microsoft.ServiceBus/namespaces/queues@2022-10-01-preview' = {
-    parent: serviceBusNamespace
-    name: 'orders-queue'
+//====================================================
+// Service Bus Topics & Subscriptions (Replaces 'orders-queue')
+// Using Domain-Specific Topics will allow multiple 
+// independent downstream services to subscribe to the same events without competing for messages.
+
+resource ordersTopic 'Microsoft.ServiceBus/namespaces/topics@2022-10-01-preview' = {
+  parent: serviceBusNamespace
+  name: 'orders-topic'
 }
+
+resource catalogTopic 'Microsoft.ServiceBus/namespaces/topics@2022-10-01-preview' = {
+  parent: serviceBusNamespace
+  name: 'catalog-topic'
+}
+
+// Sub fo the Logic app to process order events
+resource logicAppOrderSub 'Microsoft.ServiceBus/namespaces/topics/subscriptions@2022-10-01-preview' = {
+  parent:ordersTopic
+  name:'logic-app-order-processing'
+}
+
+// Subscription for the WMS API to listen to product updates (e.g., dimension/SKU changes)
+resource wmsInventorySub 'Microsoft.ServiceBus/namespaces/topics/subscriptions@2022-10-01-preview' = {
+  parent: catalogTopic
+  name: 'wms-inventory-updates'
+}
+//===================================================
+
+
 
 // Storage account (Total length is now 22 characters, safely under the 24-character limit)
 resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
@@ -85,17 +116,51 @@ resource functionApp 'Microsoft.Web/sites@2022-09-01' = {
 }
 
 
-// 6. Azure SQL Server
+//  Azure Function App (CatalogApi)
+//  New microservice dedicated to Product/Category CRUD operations. It publishes 
+// 'ProductUpdated' events to the Service Bus to keep the architecture decoupled.
+resource catalogFunctionApp 'Microsoft.Web/sites@2022-09-01' = {
+  name: '${baseName}-catalog-api'
+  location:location
+  kind: 'functionapp'
+  properties: {
+    serverFarmId:hostingPlan.id // Reusing existing app service
+    siteConfig:{
+      appSettings: [
+        {
+          name:'AzureWebJobsStorage'
+          value:'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${storageAccount.listKeys().keys[0].value}'
+        }
+        {
+          name: 'FUNCTIONS_EXTENSION_VERSION'
+          value: '4'
+        }
+        {
+          name: 'FUNCTIONS_WORKER_RUNTIME'
+          value: 'dotnet-isolated'
+        }
+        {
+          name:'ServiceBusConnection'
+          value:listKeys(resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', serviceBusNamespace.name, 'RootManageSharedAccessKey'), '2022-10-01-preview').primaryConnectionString
+        }
+      ]
+    }
+  }
+
+}
+
+
+// Azure SQL Server
 resource sqlServer 'Microsoft.Sql/servers@2022-05-01-preview' = {
   name: '${baseName}-sqlserver'
   location: location
   properties: {
-    administratorLogin: 'dbadmin'
-    administratorLoginPassword: 'Password12345!' // In production, use a secure parameter/Key Vault
+    administratorLogin: 'sqlAdminLogin'
+    administratorLoginPassword: 'sqlAdminPassword' // In production, use a secure parameter/Key Vault
   }
 }
 
-// 7. Azure SQL Database (Serverless Free/Low-Cost Tier Configuration)
+// Azure SQL Database (Serverless Free/Low-Cost Tier Configuration)
 resource sqlDatabase 'Microsoft.Sql/servers/databases@2022-05-01-preview' = {
   parent: sqlServer
   name: 'crm-db'
@@ -110,7 +175,7 @@ resource sqlDatabase 'Microsoft.Sql/servers/databases@2022-05-01-preview' = {
   }
 }
 
-// 8. Allow Azure Services to access the SQL Server (Required for the Logic App later)
+// Allow Azure Services to access the SQL Server (Required for the Logic App later)
 resource sqlFirewallRule 'Microsoft.Sql/servers/firewallRules@2022-05-01-preview' = {
   parent: sqlServer
   name: 'AllowAzureServices'
@@ -120,13 +185,15 @@ resource sqlFirewallRule 'Microsoft.Sql/servers/firewallRules@2022-05-01-preview
   }
 }
 
-// 9. Second Azure Function App (The Mock Warehouse Management System API)
+// Azure Function App (WmsApi)
+// The WMS API needs connection details to actively listen to the catalog-topic 
+// for inventory/product changes via a ServiceBusTrigger.
 resource wmsFunctionApp 'Microsoft.Web/sites@2022-09-01' = {
   name: '${baseName}-wms-api'
   location: location
   kind: 'functionapp'
   properties: {
-    serverFarmId: hostingPlan.id // Reuses the existing App Service Plan to avoid extra costs
+    serverFarmId: hostingPlan.id 
     siteConfig: {
       appSettings: [
         {
@@ -140,6 +207,10 @@ resource wmsFunctionApp 'Microsoft.Web/sites@2022-09-01' = {
         {
           name: 'FUNCTIONS_WORKER_RUNTIME'
           value: 'dotnet-isolated'
+        }
+        {
+          name: 'ServiceBusConnection' // Required for the WmsApi to subscribe to Service Bus events
+          value: listKeys(resourceId('Microsoft.ServiceBus/namespaces/authorizationRules', serviceBusNamespace.name, 'RootManageSharedAccessKey'), '2022-10-01-preview').primaryConnectionString
         }
       ]
     }
