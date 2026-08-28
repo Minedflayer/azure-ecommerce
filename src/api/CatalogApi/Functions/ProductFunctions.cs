@@ -1,4 +1,3 @@
-
 using System.Net;
 using System.Text.Json;
 using CatalogApi.Data;
@@ -7,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization; // 1. Add this using directive
 
 
 namespace CatalogApi.Functions;
@@ -39,7 +39,7 @@ public class ProductFunctions
         
     }
 
-
+    [Authorize(Roles = "Admin")]
     [Function("CreateProduct")]
     public async Task<HttpResponseData> CreateProduct(
         [HttpTrigger(AuthorizationLevel.Function, "post", Route ="products")] HttpRequestData req)
@@ -95,7 +95,18 @@ public class ProductFunctions
         existingProduct.Price = updatedProduct.Price;
         existingProduct.IsActive = updatedProduct.IsActive;
 
-        await _dbContext.SaveChangesAsync();
+        try
+        {
+            await _dbContext.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex)
+        {
+            _logger.LogWarning(ex, "SKU conflict or database error when updating product with ID: {ProductId}", id);
+            var conflictResponse = req.CreateResponse(HttpStatusCode.Conflict);
+            await conflictResponse.WriteStringAsync("A product with this SKU already exists.");
+            return conflictResponse;
+        }
+
 
         var response = req.CreateResponse(HttpStatusCode.OK);
         return response;
@@ -116,7 +127,8 @@ public class ProductFunctions
             return notFoundResponse;
         }
 
-        _dbContext.Products.Remove(existingProduct);
+        // Soft delete
+        existingProduct.IsActive = false;
         await _dbContext.SaveChangesAsync();
 
         var response = req.CreateResponse(HttpStatusCode.NoContent);
