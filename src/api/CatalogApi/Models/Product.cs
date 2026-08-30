@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 
 namespace CatalogApi.Models;
 
@@ -19,30 +17,4 @@ public class Product
 
 }
 
-public class Category
-{
-    public Guid Id {get; set;} = Guid.NewGuid();
-
-    public string Name {get; set;} = string.Empty;
-    public string Description {get; set;} = string.Empty;
-
-
-    // Hierachical categories
-    public Guid? ParentCategoryId {get; set;}
-    public Category? ParentCategory {get; set;}
-
-    public ICollection<ProductCategory> ProductCategories { get; set; } = new List<ProductCategory>();
-
-}
-
-// Junction table entity for many-to-many mapping
-public class ProductCategory
-{
-    public Guid ProductId { get; set; }
-    public Product Product { get; set; } = null!;
-
-    public Guid CategoryId { get; set; }
-    public Category Category { get; set; } = null!;
-    
-}
 

@@ -26,6 +26,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 });
 builder.Services.AddAuthorizationBuilder();
 
+// Ensure console logging is active on the worker side
+builder.Services.AddLogging();
+
 // Add EF Core DbContext
 builder.Services.AddDbContext<CatalogDbContext>(options =>
 {

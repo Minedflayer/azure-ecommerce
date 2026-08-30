@@ -11,10 +11,12 @@
 "logLevel": {
       "default": "Warning",
       "Function": "Information",
+      "Function.ProcessOrderQueue": "Information",
+      "CatalogApi": "Information",
       "Worker": "Information",
+      "Host.HealthMonitor": "None",
       "Host.Startup": "Warning",
       "Host.General": "Warning",
-      "Host.HealthMonitor": "Error",
       "Azure": "Warning",
       "Azure.Core": "Warning",
       "Azure.Storage": "Warning",
