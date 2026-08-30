@@ -155,8 +155,8 @@ resource sqlServer 'Microsoft.Sql/servers@2022-05-01-preview' = {
   name: '${baseName}-sqlserver'
   location: location
   properties: {
-    administratorLogin: 'sqlAdminLogin'
-    administratorLoginPassword: 'sqlAdminPassword' // In production, use a secure parameter/Key Vault
+    administratorLogin: sqlAdminLogin
+    administratorLoginPassword: sqlAdminPassword
   }
 }
 
