@@ -11,7 +11,14 @@
     "logLevel": {
       "default": "Information",
       "Microsoft": "Warning",
-      "Worker": "Information"
+      "Worker": "Information",
+      "Host.Results": "Warning",
+      "Function": "Information",
+      "Host.Aggregator": "Warning",
+      "Azure.Messaging.ServiceBus": "Warning",
+      "Azure.Storage.Blobs": "Warning",
+      "Azure.Core": "Warning",
+      "Microsoft.Azure.WebJobs": "Warning"
     }
   }
 }
