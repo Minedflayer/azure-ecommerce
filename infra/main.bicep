@@ -77,19 +77,7 @@ resource wmsInventorySub 'Microsoft.ServiceBus/namespaces/topics/subscriptions@2
   name: 'wms-inventory-updates'
 }
 
-// resource ordersTopic 'Microsoft.ServiceBus/namespaces/topics@2022-10-01-preview' = {
-//   parent: serviceBusNamespace
-//   name: 'orders-topic'
-// }
-
-
-
-// // Sub fo the Logic app to process order events
-// resource logicAppOrderSub 'Microsoft.ServiceBus/namespaces/topics/subscriptions@2022-10-01-preview' = {
-//   parent:ordersTopic
-//   name:'logic-app-order-processing'
-// }
-
+//===================================================
 //===================================================
 
 // Storage account (Total length is now 22 characters, safely under the 24-character limit)
@@ -114,9 +102,11 @@ resource hostingPlan 'Microsoft.Web/serverfarms@2022-09-01' = {
         reserved: false
     }
 }
+
+//================================================================
 // Function Apps
 //================================================================
-//================================================================
+
 // Azure Function App (The API Entry Point)
 resource functionApp 'Microsoft.Web/sites@2022-09-01' = {
   name: '${baseName}-api'
@@ -163,8 +153,6 @@ resource functionApp 'Microsoft.Web/sites@2022-09-01' = {
 
 
 //  Azure Function App (CatalogApi)
-//  New microservice dedicated to Product/Category CRUD operations. It publishes 
-// 'ProductUpdated' events to the Service Bus to keep the architecture decoupled.
 resource catalogFunctionApp 'Microsoft.Web/sites@2022-09-01' = {
   name: '${baseName}-catalog-api'
   location:location
