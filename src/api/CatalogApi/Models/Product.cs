@@ -1,4 +1,3 @@
-
 namespace CatalogApi.Models;
 
 public class Product
@@ -13,8 +12,6 @@ public class Product
     public bool IsActive { get; set; } = true;
 
     public ICollection<ProductCategory> ProductCategories { get; set; } = new List<ProductCategory>();
-
-
 }
 
 

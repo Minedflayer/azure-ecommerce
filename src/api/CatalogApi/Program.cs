@@ -14,8 +14,7 @@ builder.ConfigureFunctionsWebApplication();
 
 builder.Services.AddOpenTelemetry()
     .UseFunctionsWorkerDefaults()
-    .UseAzureMonitorExporter();
-
+    .UseAzureMonitorExporter(); // Directs telemetry to Application Insights
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {

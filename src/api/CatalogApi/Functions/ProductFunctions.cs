@@ -42,7 +42,7 @@ public class ProductFunctions
 
     }
 
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     [Function("CreateProduct")]
     public async Task<HttpResponseData> CreateProduct(
         [HttpTrigger(AuthorizationLevel.Function, "post", Route = "products")] HttpRequestData req)
@@ -59,7 +59,16 @@ public class ProductFunctions
         }
 
         _dbContext.Products.Add(product);
-        await _dbContext.SaveChangesAsync();
+        
+        try
+        {
+            await _dbContext.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex)
+        {
+            _logger.LogError($"SQL execution failed: {ex.InnerException?.Message}");
+            throw;
+        }
 
         var topicName = Environment.GetEnvironmentVariable("CatalogTopicName");
         await using var sender = _serviceBusClient.CreateSender(topicName);
@@ -74,6 +83,7 @@ public class ProductFunctions
         await sender.SendMessageAsync(message);
 
         var response = req.CreateResponse(HttpStatusCode.Created);
+        await response.WriteAsJsonAsync(product); // <-- Add this line
         return response;
 
     }

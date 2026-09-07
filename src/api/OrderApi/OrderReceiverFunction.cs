@@ -48,7 +48,7 @@ public class OrderReceiverFunction
     }
 }
 
-// 1. Expected Payload
+// Expected Payload
 public class OrderPayload
 {
     public string OrderId { get; set; } = string.Empty;
