@@ -65,11 +65,11 @@ resource catalogTopic 'Microsoft.ServiceBus/namespaces/topics@2022-10-01-preview
 
 // Subscriptions
 
-// Subscription for the Logic app to process events
-resource logicAppCatalogSub 'Microsoft.ServiceBus/namespaces/topics/subscriptions@2022-10-01-preview' = {
-  parent: catalogTopic
-  name: 'logic-app-processing'
-}
+// // Subscription for the Logic app to process events
+// resource logicAppCatalogSub 'Microsoft.ServiceBus/namespaces/topics/subscriptions@2022-10-01-preview' = {
+//   parent: catalogTopic
+//   name: 'logic-app-processing'
+// }
 
 // Subscription for the WMS API to listen to product updates (e.g., dimension/SKU changes)
 resource wmsInventorySub 'Microsoft.ServiceBus/namespaces/topics/subscriptions@2022-10-01-preview' = {
