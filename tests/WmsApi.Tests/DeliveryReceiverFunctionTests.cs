@@ -1,98 +1,56 @@
-using System.IO;
-using System.Net;
-using System.Text;
-using Microsoft.Azure.Functions.Worker;
-using Microsoft.Azure.Functions.Worker.Http;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
+using System.Text.Json;
 using Xunit;
-using WmsApi;
+using WmsApi; // Ensure this matches your actual namespace
 
-namespace WmsApi.Tests
+namespace WmsApi.Tests;
+
+public class DeliveryReceiverFunctionTests
 {
-    public class DeliveryReceiverFunctionTests
+    private readonly Mock<ILogger<DeliveryReceiverFunction>> _mockLogger;
+    private readonly DeliveryReceiverFunction _function;
+
+    public DeliveryReceiverFunctionTests()
     {
-        private readonly Mock<ILogger<DeliveryReceiverFunction>> _loggerMock;
-        private readonly DeliveryReceiverFunction _sut; // System Under Test
+        // 1. Arrange: Setup the shared mock logger and function instance
+        _mockLogger = new Mock<ILogger<DeliveryReceiverFunction>>();
+        _function = new DeliveryReceiverFunction(_mockLogger.Object);
+    }
 
-        public DeliveryReceiverFunctionTests()
+    [Fact]
+    public void Run_WithValidOrderCreatedEvent_ExecutesWithoutException()
+    {
+        // Arrange: Create a valid JSON string matching the expected CatalogEvent structure
+        var validPayload = JsonSerializer.Serialize(new
         {
-            _loggerMock = new Mock<ILogger<DeliveryReceiverFunction>>();
-            _sut = new DeliveryReceiverFunction(_loggerMock.Object);
-        }
+            EventType = "OrderCreated",
+            Order = new
+            {
+                OrderId = "ORD-TEST-123",
+                CustomerEmail = "test@example.com",
+                TotalAmount = 250.00m
+            }
+        });
 
-        [Fact]
-        public async Task DeliveryReceiverFunction_ValidPayload_ReturnsOkWithSuccessResponseBody()
-        {
-            // Arrange
-            string validPayload = "{\"OrderId\":\"ORD-CLOUD-1005\",\"CustomerEmail\":\"victor@example.com\",\"TotalAmount\":299.99}";
-            var (mockRequest, mockResponse) = CreateMockRequest(validPayload);
+        // Act: Pass the string directly into the function
+        var exception = Record.Exception(() => _function.Run(validPayload));
 
-            // Act
-            var response = await _sut.Run(mockRequest.Object);
+        // Assert: Ensure the processing logic completes without throwing errors
+        Assert.Null(exception);
+    }
 
-            // Assert
-            Assert.NotNull(response);
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    [Fact]
+    public void Run_WithInvalidJson_CatchesExceptionGracefully()
+    {
+        // Arrange: Create a malformed string
+        string invalidPayload = "This is not valid JSON";
 
-            // Read response stream body to verify written string
-            response.Body.Seek(0, SeekOrigin.Begin);
-            using var reader = new StreamReader(response.Body, Encoding.UTF8);
-            string responseBody = await reader.ReadToEndAsync();
+        // Act: Pass the bad string into the function
+        var exception = Record.Exception(() => _function.Run(invalidPayload));
 
-            Assert.Contains("Delivery details successfully registered in mock WMS.", responseBody);
-            Assert.Contains("success", responseBody);
-            
-        }
-
-        [Fact]
-        public async Task DeliveryReceiverFunction_EmptyPayload_ReturnsOk()
-        {
-            // Arrange
-            string emptyPayload = "";
-            var (mockRequest, mockResponse) = CreateMockRequest(emptyPayload);
-
-            // Act
-            var response = await _sut.Run(mockRequest.Object);
-
-            // Assert
-            Assert.NotNull(response);
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        }
-
-        private (Mock<HttpRequestData>, Mock<HttpResponseData>) CreateMockRequest(string body)
-        {
-            var mockContext = new Mock<FunctionContext>();
-            
-            var services = new ServiceCollection();
-            services.AddOptions();
-            var serviceProvider = services.BuildServiceProvider();
-
-            mockContext.SetupProperty(c => c.InstanceServices, serviceProvider);
-
-            var mockRequest = new Mock<HttpRequestData>(mockContext.Object);
-            var mockResponse = new Mock<HttpResponseData>(mockContext.Object);
-
-            // Mock Request Body
-            var stream = new MemoryStream(Encoding.UTF8.GetBytes(body));
-            mockRequest.Setup(r => r.Body).Returns(stream);
-
-            // Mock Response Body and Properties
-            var responseStream = new MemoryStream();
-            mockResponse.Setup(r => r.Body).Returns(responseStream);
-            mockResponse.SetupProperty(r => r.StatusCode);
-
-            // HttpHeader
-            var mockHeaders = new Mock<HttpHeadersCollection>();
-            mockResponse.SetupProperty(r => r.Headers, mockHeaders.Object);
-
-            // Link CreateResponse to return Mocked Response
-            mockRequest.Setup(r => r.CreateResponse()).Returns(mockResponse.Object);
-
-
-            return(mockRequest, mockResponse);
-            
-        }
+        // Assert: The function contains a try-catch for JsonException, 
+        // so it should handle it internally and NOT throw it back to the runtime.
+        Assert.Null(exception);
     }
 }

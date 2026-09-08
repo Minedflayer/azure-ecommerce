@@ -72,6 +72,7 @@ jobs:
       - name: Deploy Bicep template
         uses: azure/arm-deploy@v2
         with:
+          scope: resourcegroup
           resourceGroupName: ${{ env.RESOURCE_GROUP }}
           template: ${{ env.BICEP_FILE_PATH }}
           parameters: >-
