@@ -16,39 +16,39 @@ public class OrderReceiverFunction
 
     [Function("OrderReceiverFunction")]
     public async Task<OrderResponse> Run(
-        [HttpTrigger(AuthorizationLevel.Function, "post", Route = "orders")] HttpRequestData req) 
+        [HttpTrigger(AuthorizationLevel.Function, "post", Route = "orders")] HttpRequestData req)
     {
         _logger.LogInformation("Receiving new order payload.");
 
-        
-// Read and strictly deserialize the incoming JSON
-var order = await req.ReadFromJsonAsync<OrderPayload>();
 
-// Validate specific business logic
-if (order == null || string.IsNullOrWhiteSpace(order.OrderId)) 
-{
-    var badResponse = req.CreateResponse(HttpStatusCode.BadRequest);
-    await badResponse.WriteStringAsync("Invalid order format. OrderId is required.");
-    return new OrderResponse { HttpResponse = badResponse };
-}
+        // Read and strictly deserialize the incoming JSON
+        var order = await req.ReadFromJsonAsync<OrderPayload>();
 
-// Serialize the validated object back to a JSON string for the Service Bus
-string validatedMessage = System.Text.Json.JsonSerializer.Serialize(order);
+        // Validate specific business logic
+        if (order == null || string.IsNullOrWhiteSpace(order.OrderId))
+        {
+            var badResponse = req.CreateResponse(HttpStatusCode.BadRequest);
+            await badResponse.WriteStringAsync("Invalid order format. OrderId is required.");
+            return new OrderResponse { HttpResponse = badResponse };
+        }
+
+        // Serialize the validated object back to a JSON string for the Service Bus
+        string validatedMessage = System.Text.Json.JsonSerializer.Serialize(order);
 
         // Create HTTP 202 Accepted Response
         var response = req.CreateResponse(HttpStatusCode.Accepted);
         await response.WriteStringAsync("Order received and queued for processing.");
 
         // Return both HTTP response and payload for the Service Bus
-        return new OrderResponse 
+        return new OrderResponse
         {
             HttpResponse = response,
             ServiceBusMessage = validatedMessage
         };
-    } 
+    }
 }
 
-// 1. Define the Expected Payload
+// Expected Payload
 public class OrderPayload
 {
     public string OrderId { get; set; } = string.Empty;

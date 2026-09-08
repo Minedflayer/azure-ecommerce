@@ -1,9 +1,7 @@
+using System.Text.Json;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Functions.Worker.Http;
-using System.Net;
+using WmsApi.Models;
 
 namespace WmsApi;
 
@@ -17,25 +15,44 @@ public class DeliveryReceiverFunction
     }
 
     [Function("DeliveryReceiverFunction")]
-    public async Task<HttpResponseData> Run(
-        [HttpTrigger(AuthorizationLevel.Function, "post", Route = "delivery")] HttpRequestData req)
+    public void Run(
+        [ServiceBusTrigger("catalog-topic", "wms-inventory-updates", Connection = "ServiceBusConnection")] string message)
     {
-        _logger.LogInformation("WMS API received a new delivery processing request from Logic App.");
+        try
+        {
+            Console.WriteLine($"\n[RAW MESSAGE RECEIVED IN WMS]: {message}\n");
 
-        // Read incoming JSON
-        string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            var catalogEvent = JsonSerializer.Deserialize<CatalogEvent>(message, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+            // Route the event based on its type
+            if (catalogEvent?.EventType == "OrderCreated" && catalogEvent.Order != null)
+            {
+                ProcessNewOrder(catalogEvent.Order);
+            }
+            else
+            {
+                // Handles ProductCreated, ProductUpdated, etc.
+                _logger.LogInformation($"Received event type '{catalogEvent?.EventType}'. Metadata updated in WMS.");
+            }
+        }
+        catch (JsonException ex)
+        {
 
-        // In a real scenario, you would deserialize this into a strongly-typed C# object.
-        // For the mock WMS, we simply log the raw JSON payload to verify the data flow.
-        _logger.LogInformation($"Incoming delivery payload details:\n{requestBody}");
+            _logger.LogError($"Failed to deserialize message: {ex.Message}");
+        }
+        _logger.LogInformation("WMS API received a new domain event from the catalog-topic.");
 
-        var response = req.CreateResponse(HttpStatusCode.OK);
-        response.Headers.Add("Content-Type", "application/json; charset=utf-8");
-
-        await response.WriteStringAsync("{\"status\": \"success\", \"message\": \"Delivery details successfully registered in mock WMS.\"}");
-
-        return response;
+        _logger.LogInformation($"Incoming payload details:\n{message}");
 
     }
 
+    private void ProcessNewOrder(OrderDetails order)
+    {
+    _logger.LogInformation("WMS processing started for order: {OrderId}. Customer: {CustomerEmail}. Amount: {TotalAmount}", 
+        order.OrderId, 
+        order.CustomerEmail, 
+        order.TotalAmount);        
+    }
 }
