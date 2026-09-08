@@ -4105,8 +4105,8 @@
           "framework": "net10.0",
           "targetAlias": "net10.0",
           "projectReferences": {
-            "c:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\src\\api\\OrderApi\\OrderApi.csproj": {
-              "projectPath": "c:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\src\\api\\OrderApi\\OrderApi.csproj"
+            "C:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\src\\api\\OrderApi\\OrderApi.csproj": {
+              "projectPath": "C:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\src\\api\\OrderApi\\OrderApi.csproj"
             }
           }
         }

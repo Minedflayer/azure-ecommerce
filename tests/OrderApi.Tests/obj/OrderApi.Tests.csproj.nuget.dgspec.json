@@ -4,14 +4,14 @@
     "c:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\tests\\OrderApi.Tests\\OrderApi.Tests.csproj": {}
   },
   "projects": {
-    "c:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\src\\api\\OrderApi\\OrderApi.csproj": {
+    "C:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\src\\api\\OrderApi\\OrderApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\src\\api\\OrderApi\\OrderApi.csproj",
+        "projectUniqueName": "C:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\src\\api\\OrderApi\\OrderApi.csproj",
         "projectName": "OrderApi",
-        "projectPath": "c:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\src\\api\\OrderApi\\OrderApi.csproj",
+        "projectPath": "C:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\src\\api\\OrderApi\\OrderApi.csproj",
         "packagesPath": "C:\\Users\\Victor Tell\\.nuget\\packages\\",
-        "outputPath": "c:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\src\\api\\OrderApi\\obj\\",
+        "outputPath": "C:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\src\\api\\OrderApi\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -151,8 +151,8 @@
             "framework": "net10.0",
             "targetAlias": "net10.0",
             "projectReferences": {
-              "c:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\src\\api\\OrderApi\\OrderApi.csproj": {
-                "projectPath": "c:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\src\\api\\OrderApi\\OrderApi.csproj"
+              "C:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\src\\api\\OrderApi\\OrderApi.csproj": {
+                "projectPath": "C:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\src\\api\\OrderApi\\OrderApi.csproj"
               }
             }
           }

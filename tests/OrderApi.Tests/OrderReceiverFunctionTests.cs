@@ -46,6 +46,8 @@ namespace OrderApi.Tests
 
             
             Assert.NotNull(result);
+            
+            // Verify HTTP response
             Assert.NotNull(result.HttpResponse);
             Assert.Equal(HttpStatusCode.Accepted, result.HttpResponse.StatusCode);
 
@@ -61,10 +63,9 @@ namespace OrderApi.Tests
         private (Mock<HttpRequestData>, Mock<HttpResponseData>) CreateMockRequest(string body)
         {
             var mockContext = new Mock<FunctionContext>();
-
             var services = new ServiceCollection();
+            
             services.AddOptions(); // Required for JSON serialization options
-
             // Add the specific WorkerOptions the isolated framework requires for JSON parsing
             services.Configure<WorkerOptions>(workerOptions =>
             {
@@ -84,11 +85,11 @@ namespace OrderApi.Tests
             var mockRequest = new Mock<HttpRequestData>(mockContext.Object);
             var mockResponse = new Mock<HttpResponseData>(mockContext.Object);
 
-            // Request Body
+            // Setup Request Body
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(body));
             mockRequest.Setup(r => r.Body).Returns(stream);
 
-            // Response Body
+            // Setup Response Body
             var responseStream = new MemoryStream();
             mockResponse.Setup(r => r.Body).Returns(responseStream);
             mockResponse.SetupProperty(r => r.StatusCode);
