@@ -49,13 +49,13 @@ jobs:
 
       # Publish all three APIs
       - name: Publish Order API
-        run: dotnet publish ${{ env.ORDER_API_PATH }} --configuration Release --output ./publish/OrderApi
+        run: dotnet publish ${{ env.ORDER_API_PATH }} --configuration Release -r win-x64 --output ./publish/OrderApi
 
       - name: Publish Catalog API
-        run: dotnet publish ${{ env.CATALOG_API_PATH }} --configuration Release --output ./publish/CatalogApi
+        run: dotnet publish ${{ env.CATALOG_API_PATH }} --configuration Release -r win-x64 --output ./publish/CatalogApi
 
       - name: Publish WMS API
-        run: dotnet publish ${{ env.WMS_API_PATH }} --configuration Release --output ./publish/WmsApi
+        run: dotnet publish ${{ env.WMS_API_PATH }} --configuration Release -r win-x64 --output ./publish/WmsApi
 
       # Upload Artifacts
       - name: Upload Order API Artifact
