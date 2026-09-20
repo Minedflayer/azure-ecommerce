@@ -49,13 +49,13 @@ jobs:
 
       # Publish all three APIs
       - name: Publish Order API
-        run: dotnet publish ${{ env.ORDER_API_PATH }} --configuration Release -r win-x64 --output ./publish/OrderApi
+        run: dotnet publish ${{ env.ORDER_API_PATH }} --configuration Release --output ./publish/OrderApi
 
       - name: Publish Catalog API
-        run: dotnet publish ${{ env.CATALOG_API_PATH }} --configuration Release -r win-x64 --output ./publish/CatalogApi
+        run: dotnet publish ${{ env.CATALOG_API_PATH }} --configuration Release --output ./publish/CatalogApi
 
       - name: Publish WMS API
-        run: dotnet publish ${{ env.WMS_API_PATH }} --configuration Release -r win-x64 --output ./publish/WmsApi
+        run: dotnet publish ${{ env.WMS_API_PATH }} --configuration Release --output ./publish/WmsApi
 
       # Upload Artifacts
       - name: Upload Order API Artifact
@@ -149,7 +149,6 @@ jobs:
           package: ./publish/WmsApi
 
       # Post-Deployment Integration Smoke Test
-      # Post-Deployment Integration Smoke Test
       - name: Run Live Integration Tests
         shell: pwsh
         run: |
@@ -163,18 +162,19 @@ jobs:
           $success = $false
           
           while (-not $success -and $retryCount -lt $maxRetries) {
-              try {
-                  $orderResponse = Invoke-WebRequest -Uri $orderApiUrl -Method Post -Body $orderPayload -ContentType "application/json"
-                  
-                  if ($orderResponse.StatusCode -eq 202) {
-                      Write-Host "Success: Order API returned 202 Accepted" -ForegroundColor Green
-                      $success = $true
-                  } else {
-                      throw "Unexpected status code: $($orderResponse.StatusCode)"
-                  }
-              } catch {
+              # -SkipHttpErrorCheck forces PowerShell to return the actual response object even on failures
+              $orderResponse = Invoke-WebRequest -Uri $orderApiUrl -Method Post -Body $orderPayload -ContentType "application/json" -SkipHttpErrorCheck
+              
+              if ($orderResponse.StatusCode -eq 202) {
+                  Write-Host "Success: Order API returned 202 Accepted" -ForegroundColor Green
+                  $success = $true
+              } else {
                   $retryCount++
-                  Write-Host "Attempt $retryCount failed: $($_.Exception.Message). Retrying in 15 seconds..." -ForegroundColor Yellow
+                  Write-Host "Attempt $retryCount failed." -ForegroundColor Yellow
+                  Write-Host "Status Code: $($orderResponse.StatusCode) $($orderResponse.StatusDescription)" -ForegroundColor Red
+                  Write-Host "Response Body: $($orderResponse.Content)" -ForegroundColor Red
+                  Write-Host "Headers: $($orderResponse.Headers | ConvertTo-Json -Compress)" -ForegroundColor DarkGray
+                  
                   if ($retryCount -ge $maxRetries) {
                       throw "Live Order API failed after $maxRetries attempts."
                   }
