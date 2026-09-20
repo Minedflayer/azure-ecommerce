@@ -115,6 +115,8 @@ resource functionApp 'Microsoft.Web/sites@2022-09-01' = {
   properties: {
     serverFarmId: hostingPlan.id
     siteConfig: {
+      netFrameworkVersion: 'v8.0'       
+      use32BitWorkerProcess: false      
       appSettings: [
         {
           name: 'AzureWebJobsStorage'
@@ -160,6 +162,8 @@ resource catalogFunctionApp 'Microsoft.Web/sites@2022-09-01' = {
   properties: {
     serverFarmId:hostingPlan.id // Reusing existing app service
     siteConfig:{
+      netFrameworkVersion: 'v8.0'       
+      use32BitWorkerProcess: false  
       appSettings: [
         {
           name:'AzureWebJobsStorage'
@@ -201,6 +205,8 @@ resource wmsFunctionApp 'Microsoft.Web/sites@2022-09-01' = {
   properties: {
     serverFarmId: hostingPlan.id 
     siteConfig: {
+      netFrameworkVersion: 'v8.0'       
+      use32BitWorkerProcess: false  
       appSettings: [
         {
           name: 'AzureWebJobsStorage'

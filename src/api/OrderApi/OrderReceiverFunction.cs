@@ -16,7 +16,7 @@ public class OrderReceiverFunction
 
     [Function("OrderReceiverFunction")]
     public async Task<OrderResponse> Run(
-        [HttpTrigger(AuthorizationLevel.Function, "post", Route = "orders")] HttpRequestData req)
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "orders")] HttpRequestData req)
     {
         _logger.LogInformation("Receiving new order payload.");
 
