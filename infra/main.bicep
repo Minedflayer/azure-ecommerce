@@ -146,7 +146,10 @@ resource functionApp 'Microsoft.Web/sites@2022-09-01' = {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
           value: appInsights.properties.ConnectionString
         }
-
+        {
+          name: 'WEBSITE_RUN_FROM_PACKAGE'
+          value: '1'
+        }
         
       ]
     }
@@ -188,6 +191,10 @@ resource catalogFunctionApp 'Microsoft.Web/sites@2022-09-01' = {
         {
           name: 'CatalogTopicName'
           value: catalogTopic.name
+        }
+        {
+          name: 'WEBSITE_RUN_FROM_PACKAGE'
+          value: '1'
         }
       ]
     }
@@ -231,6 +238,10 @@ resource wmsFunctionApp 'Microsoft.Web/sites@2022-09-01' = {
         {
           name: 'CatalogTopicName'
           value: catalogTopic.name
+        }
+        {
+          name: 'WEBSITE_RUN_FROM_PACKAGE'
+          value: '1'
         }
       ]
     }
