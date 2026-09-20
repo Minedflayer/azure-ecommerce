@@ -149,17 +149,35 @@ jobs:
           package: ./publish/WmsApi
 
       # Post-Deployment Integration Smoke Test
+      # Post-Deployment Integration Smoke Test
       - name: Run Live Integration Tests
         shell: pwsh
         run: |
           $orderApiUrl = "https://${{ env.ORDER_API_NAME }}.azurewebsites.net/api/orders"
-          $catalogApiUrl = "https://${{ env.CATALOG_API_NAME }}.azurewebsites.net/api/products"
-
-          Write-Host "Verifying live Order API endpoint..." -ForegroundColor Cyan
           $orderPayload = @{ OrderId = "TEST-$(Get-Random)"; CustomerEmail = "ci@test.com"; TotalAmount = 100 } | ConvertTo-Json
-          $orderResponse = Invoke-WebRequest -Uri $orderApiUrl -Method Post -Body $orderPayload -ContentType "application/json"
           
-          if ($orderResponse.StatusCode -ne 202) {
-              throw "Live Order API failed with status $($orderResponse.StatusCode)"
+          Write-Host "Verifying live Order API endpoint at $orderApiUrl..." -ForegroundColor Cyan
+          
+          $maxRetries = 5
+          $retryCount = 0
+          $success = $false
+          
+          while (-not $success -and $retryCount -lt $maxRetries) {
+              try {
+                  $orderResponse = Invoke-WebRequest -Uri $orderApiUrl -Method Post -Body $orderPayload -ContentType "application/json"
+                  
+                  if ($orderResponse.StatusCode -eq 202) {
+                      Write-Host "Success: Order API returned 202 Accepted" -ForegroundColor Green
+                      $success = $true
+                  } else {
+                      throw "Unexpected status code: $($orderResponse.StatusCode)"
+                  }
+              } catch {
+                  $retryCount++
+                  Write-Host "Attempt $retryCount failed: $($_.Exception.Message). Retrying in 15 seconds..." -ForegroundColor Yellow
+                  if ($retryCount -ge $maxRetries) {
+                      throw "Live Order API failed after $maxRetries attempts."
+                  }
+                  Start-Sleep -Seconds 15
+              }
           }
-          Write-Host "Success: Order API returned 202 Accepted" -ForegroundColor Green

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "rQ5y49Q4oNs=",
+  "dgSpecHash": "TU4R0jhQ0Xk=",
   "success": true,
-  "projectFilePath": "c:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\tests\\OrderApi.Tests\\OrderApi.Tests.csproj",
+  "projectFilePath": "C:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\tests\\OrderApi.Tests\\OrderApi.Tests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Victor Tell\\.nuget\\packages\\azure.core\\1.61.0\\azure.core.1.61.0.nupkg.sha512",
     "C:\\Users\\Victor Tell\\.nuget\\packages\\azure.core.amqp\\1.3.1\\azure.core.amqp.1.3.1.nupkg.sha512",

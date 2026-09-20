@@ -64,6 +64,10 @@
               "target": "Package",
               "version": "[2.1.0, )"
             },
+            "Microsoft.Azure.Functions.Worker.Extensions.ServiceBus": {
+              "target": "Package",
+              "version": "[5.24.0, )"
+            },
             "Microsoft.Azure.Functions.Worker.OpenTelemetry": {
               "target": "Package",
               "version": "[1.2.0, )"

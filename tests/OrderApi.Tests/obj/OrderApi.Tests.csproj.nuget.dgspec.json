@@ -1,7 +1,7 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\tests\\OrderApi.Tests\\OrderApi.Tests.csproj": {}
+    "C:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\tests\\OrderApi.Tests\\OrderApi.Tests.csproj": {}
   },
   "projects": {
     "C:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\src\\api\\OrderApi\\OrderApi.csproj": {
@@ -122,14 +122,14 @@
         }
       }
     },
-    "c:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\tests\\OrderApi.Tests\\OrderApi.Tests.csproj": {
+    "C:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\tests\\OrderApi.Tests\\OrderApi.Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\tests\\OrderApi.Tests\\OrderApi.Tests.csproj",
+        "projectUniqueName": "C:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\tests\\OrderApi.Tests\\OrderApi.Tests.csproj",
         "projectName": "OrderApi.Tests",
-        "projectPath": "c:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\tests\\OrderApi.Tests\\OrderApi.Tests.csproj",
+        "projectPath": "C:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\tests\\OrderApi.Tests\\OrderApi.Tests.csproj",
         "packagesPath": "C:\\Users\\Victor Tell\\.nuget\\packages\\",
-        "outputPath": "c:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\tests\\OrderApi.Tests\\obj\\",
+        "outputPath": "C:\\Users\\Victor Tell\\repos\\NET-projects\\ecommerce-integration\\tests\\OrderApi.Tests\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
