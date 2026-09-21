@@ -48,10 +48,7 @@ jobs:
           dotnet test ./tests/WmsApi.Tests/WmsApi.Tests.csproj --configuration Release
 
       - name: Publish Order API
-        run: |
-          dotnet publish ${{ env.ORDER_API_PATH }} --configuration Release --output ./publish/OrderApi
-          cd ./publish/OrderApi
-          zip -r ../OrderApi.zip .
+        run: dotnet publish ${{ env.ORDER_API_PATH }} --configuration Release --output ./publish/OrderApi
 
       - name: Publish Catalog API
         run: dotnet publish ${{ env.CATALOG_API_PATH }} --configuration Release --output ./publish/CatalogApi
@@ -64,19 +61,22 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: order-api-package
-          path: ./publish/OrderApi.zip
+          path: ./publish/OrderApi
+          include-hidden-files: true
 
       - name: Upload Catalog API Artifact
         uses: actions/upload-artifact@v4
         with:
           name: catalog-api-package
           path: ./publish/CatalogApi
+          include-hidden-files: true
 
       - name: Upload WMS API Artifact
         uses: actions/upload-artifact@v4
         with:
           name: wms-api-package
           path: ./publish/WmsApi
+          include-hidden-files: true
 
   deploy-infrastructure:
     name: Deploy Azure Infrastructure
