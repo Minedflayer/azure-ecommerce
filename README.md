@@ -11,7 +11,7 @@ An event-driven integration application designed to process e-commerce orders, r
 *   **Data Store (Azure SQL Database):** Maintains records of customers and orders using idempotent `UPSERT` logic.
 
 <p align="center">
-  <img src="images/architechture.png" alt="Architecture Overview" />
+  <img src="images/architechture-updated.png" alt="Architecture Overview" />
 </p>
 
 ## Technology Stack
