@@ -47,9 +47,11 @@ jobs:
           dotnet test ./tests/OrderApi.Tests/OrderApi.Tests.csproj --configuration Release
           dotnet test ./tests/WmsApi.Tests/WmsApi.Tests.csproj --configuration Release
 
-      # Publish all three APIs
       - name: Publish Order API
-        run: dotnet publish ${{ env.ORDER_API_PATH }} --configuration Release --output ./publish/OrderApi
+        run: |
+          dotnet publish ${{ env.ORDER_API_PATH }} --configuration Release --output ./publish/OrderApi
+          cd ./publish/OrderApi
+          zip -r ../OrderApi.zip .
 
       - name: Publish Catalog API
         run: dotnet publish ${{ env.CATALOG_API_PATH }} --configuration Release --output ./publish/CatalogApi
@@ -62,7 +64,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: order-api-package
-          path: ./publish/OrderApi
+          path: ./publish/OrderApi.zip
 
       - name: Upload Catalog API Artifact
         uses: actions/upload-artifact@v4
