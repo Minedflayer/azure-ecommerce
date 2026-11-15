@@ -1,4 +1,5 @@
 using System.Net;
+using Azure;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
@@ -25,11 +26,18 @@ public class OrderReceiverFunction
         var order = await req.ReadFromJsonAsync<OrderPayload>();
 
         // Validate specific business logic
-        if (order == null || string.IsNullOrWhiteSpace(order.OrderId))
+        if (order == null || string.IsNullOrWhiteSpace(order.OrderId) || order.OrderId.Length > 50)
         {
             var badResponse = req.CreateResponse(HttpStatusCode.BadRequest);
             await badResponse.WriteStringAsync("Invalid order format. OrderId is required.");
             return new OrderResponse { HttpResponse = badResponse };
+        }
+
+        if (string.IsNullOrWhiteSpace(order.CustomerEmail) || order.CustomerEmail.Length > 256)
+        {
+            var badResponse = req.CreateResponse(HttpStatusCode.BadRequest);
+            await badResponse.WriteStringAsync("CustomerEmail is required and must be at most 256 characters.");
+            return new OrderResponse {HttpResponse = badResponse};
         }
 
         // Serialize the validated object back to a JSON string for the Service Bus

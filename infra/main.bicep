@@ -10,6 +10,9 @@ param sqlAdminLogin string
 @secure()
 param sqlAdminPassword string
 
+@secure()
+param catalogSqlConnectionString string
+
 // Create a 13-character unique hash based on the resource group
 var uniqueSeed = uniqueString(resourceGroup().id) 
 var baseName = '${prefix}${uniqueSeed}' // Total: 17 characters
@@ -165,7 +168,7 @@ resource catalogFunctionApp 'Microsoft.Web/sites@2022-09-01' = {
   properties: {
     serverFarmId:hostingPlan.id // Reusing existing app service
     siteConfig:{
-      netFrameworkVersion: 'v8.0'       
+      netFrameworkVersion: 'v10.0'
       use32BitWorkerProcess: false  
       appSettings: [
         {
@@ -174,7 +177,7 @@ resource catalogFunctionApp 'Microsoft.Web/sites@2022-09-01' = {
         }
         {
           name: 'FUNCTIONS_EXTENSION_VERSION'
-          value: '4'
+          value: '~4'
         }
         {
           name: 'FUNCTIONS_WORKER_RUNTIME'
@@ -191,6 +194,10 @@ resource catalogFunctionApp 'Microsoft.Web/sites@2022-09-01' = {
         {
           name: 'CatalogTopicName'
           value: catalogTopic.name
+        }
+        {
+          name: 'SqlConnectionString'
+          value: catalogSqlConnectionString
         }
         {
           name: 'WEBSITE_RUN_FROM_PACKAGE'
@@ -212,7 +219,7 @@ resource wmsFunctionApp 'Microsoft.Web/sites@2022-09-01' = {
   properties: {
     serverFarmId: hostingPlan.id 
     siteConfig: {
-      netFrameworkVersion: 'v8.0'       
+      netFrameworkVersion: 'v10.0'
       use32BitWorkerProcess: false  
       appSettings: [
         {

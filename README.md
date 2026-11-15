@@ -57,7 +57,10 @@ The GitHub Actions workflow in `.github/workflows/deploy-pipeline.yml` runs on p
 
 1. **Build and Test:** Builds OrderApi, CatalogApi, and WmsApi, runs the existing OrderApi and WmsApi unit test projects, and publishes deployment artifacts for all three APIs.
 2. **Deploy Infrastructure:** Uses `infra/main.bicep` to provision the three Function Apps, Service Bus queue and topic subscription, Azure SQL, storage, and monitoring resources in `rg-ecommerce-prod`.
-3. **Deploy Functions:** Deploys the published packages to their respective Azure Function Apps.
-4. **Smoke Test:** Submits a sample order to the deployed OrderApi and checks for HTTP 202 Accepted. This verifies order acceptance; it does not verify downstream database persistence or WMS processing.
+3. **Migrate Database:** Applies the idempotent EF Core migration script generated during the build. The script uses `dbo.__EFMigrationsHistory` to skip applied migrations.
+4. **Deploy Functions:** Deploys the published packages to their respective Azure Function Apps.
+5. **Smoke Test:** Submits a guest order with a unique email and checks for both HTTP 202 and the same order ID and email in `crm-db.dbo.Orders`.
 
-The workflow currently installs the .NET 8 SDK, and the Bicep template configures all Function Apps for .NET 8. These settings still need to be aligned with the .NET 10 targets in CatalogApi and WmsApi for deployment of the current code.
+Set the GitHub Actions secret `CATALOG_SQL_CONNECTION_STRING` to the application's Azure SQL connection string. Set `CATALOG_MIGRATION_CONNECTION_STRING` to a SQL connection string with permission to apply schema changes. Both must target `crm-db`. The Azure login used by the workflow needs permission to manage temporary SQL firewall rules if the runner cannot already reach the database.
+
+Keep the legacy `ecommerce-routing-logic` Logic App disabled in existing environments. Its auto-complete trigger competes with `ProcessOrderQueue` for messages on `orders-queue`.

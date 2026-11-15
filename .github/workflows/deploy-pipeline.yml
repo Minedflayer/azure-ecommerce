@@ -6,7 +6,6 @@ on:
       - main
 
 env:
-  DOTNET_VERSION: '8.0.x'
   RESOURCE_GROUP: 'rg-ecommerce-prod'
   # Define all three function app names
   ORDER_API_NAME: 'ecom52ekuuuicvepu-api'
@@ -29,7 +28,9 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+          dotnet-version: |
+            8.0.x
+            10.0.x
 
       # Build all three APIs
       - name: Build Order API
@@ -40,6 +41,19 @@ jobs:
 
       - name: Build WMS API
         run: dotnet build ${{ env.WMS_API_PATH }} --configuration Release
+
+      - name: Generate Catalog database migration script
+        run: |
+          dotnet tool restore
+          dotnet ef migrations has-pending-model-changes --project "$CATALOG_API_PATH" --configuration Release --no-build
+          dotnet ef migrations script --idempotent --project "$CATALOG_API_PATH" --configuration Release --no-build --output ./publish/database/catalog.sql
+
+      - name: Upload Catalog database migration
+        uses: actions/upload-artifact@v4
+        with:
+          name: catalog-db-migrations
+          path: ./publish/database/catalog.sql
+          if-no-files-found: error
 
       # Run Unit Tests (Assuming you add a CatalogApi test project later)
       - name: Run Unit Tests
@@ -92,20 +106,60 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Deploy Bicep template
-        uses: azure/arm-deploy@v2
+        shell: pwsh
+        env:
+          SQL_ADMIN_LOGIN: ${{ secrets.SQL_ADMIN_LOGIN }}
+          SQL_ADMIN_PASSWORD: ${{ secrets.SQL_ADMIN_PASSWORD }}
+          CATALOG_SQL_CONNECTION_STRING: ${{ secrets.CATALOG_SQL_CONNECTION_STRING }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if (-not $env:CATALOG_SQL_CONNECTION_STRING) {
+              throw 'Set the CATALOG_SQL_CONNECTION_STRING secret before deploying infrastructure.'
+          }
+          $parametersFile = Join-Path $env:RUNNER_TEMP 'ecommerce-deployment.parameters.json'
+          try {
+              @{
+                  '$schema' = 'https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#'
+                  contentVersion = '1.0.0.0'
+                  parameters = @{
+                      sqlAdminLogin = @{ value = $env:SQL_ADMIN_LOGIN }
+                      sqlAdminPassword = @{ value = $env:SQL_ADMIN_PASSWORD }
+                      catalogSqlConnectionString = @{ value = $env:CATALOG_SQL_CONNECTION_STRING }
+                  }
+              } | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $parametersFile
+              az deployment group create --resource-group $env:RESOURCE_GROUP --template-file $env:BICEP_FILE_PATH --parameters "@$parametersFile" --output none
+              if ($LASTEXITCODE -ne 0) { throw 'Infrastructure deployment failed.' }
+          } finally {
+              if (Test-Path -LiteralPath $parametersFile) { Remove-Item -LiteralPath $parametersFile }
+          }
+
+  migrate-database:
+    name: Apply Catalog database migrations
+    runs-on: ubuntu-latest
+    needs: deploy-infrastructure
+    steps:
+      - name: Download Catalog database migration
+        uses: actions/download-artifact@v4
         with:
-          scope: resourcegroup
-          resourceGroupName: ${{ env.RESOURCE_GROUP }}
-          template: ${{ env.BICEP_FILE_PATH }}
-          parameters: >-
-            sqlAdminLogin=${{ secrets.SQL_ADMIN_LOGIN }}
-            sqlAdminPassword=${{ secrets.SQL_ADMIN_PASSWORD }}
-          failOnStdErr: false
+          name: catalog-db-migrations
+          path: ./publish/database
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Apply idempotent EF migration script
+        uses: azure/sql-action@v2.4
+        with:
+          connection-string: ${{ secrets.CATALOG_MIGRATION_CONNECTION_STRING }}
+          path: ./publish/database/catalog.sql
+          arguments: -b
 
   deploy-functions:
     name: Deploy Azure Functions
     runs-on: ubuntu-latest
-    needs: deploy-infrastructure
+    needs: migrate-database
     steps:
       # Download Artifacts
       - name: Download Order API Artifact
@@ -150,36 +204,51 @@ jobs:
           app-name: ${{ env.WMS_API_NAME }}
           package: ./publish/WmsApi
 
-      # Post-Deployment Integration Smoke Test
-      - name: Run Live Integration Tests
+      - name: Submit a guest order
         shell: pwsh
         run: |
-          $orderApiUrl = "https://${{ env.ORDER_API_NAME }}.azurewebsites.net/api/orders"
-          $orderPayload = @{ OrderId = "TEST-$(Get-Random)"; CustomerEmail = "ci@test.com"; TotalAmount = 100 } | ConvertTo-Json
-          
-          Write-Host "Verifying live Order API endpoint at $orderApiUrl..." -ForegroundColor Cyan
-          
-          $maxRetries = 5
-          $retryCount = 0
-          $success = $false
-          
-          while (-not $success -and $retryCount -lt $maxRetries) {
-              # -SkipHttpErrorCheck forces PowerShell to return the actual response object even on failures
-              $orderResponse = Invoke-WebRequest -Uri $orderApiUrl -Method Post -Body $orderPayload -ContentType "application/json" -SkipHttpErrorCheck
-              
-              if ($orderResponse.StatusCode -eq 202) {
-                  Write-Host "Success: Order API returned 202 Accepted" -ForegroundColor Green
-                  $success = $true
-              } else {
-                  $retryCount++
-                  Write-Host "Attempt $retryCount failed." -ForegroundColor Yellow
-                  Write-Host "Status Code: $($orderResponse.StatusCode) $($orderResponse.StatusDescription)" -ForegroundColor Red
-                  Write-Host "Response Body: $($orderResponse.Content)" -ForegroundColor Red
-                  Write-Host "Headers: $($orderResponse.Headers | ConvertTo-Json -Compress)" -ForegroundColor DarkGray
-                  
-                  if ($retryCount -ge $maxRetries) {
-                      throw "Live Order API failed after $maxRetries attempts."
-                  }
-                  Start-Sleep -Seconds 15
-              }
+          $ErrorActionPreference = 'Stop'
+          $orderId = 'GUEST-SMOKE-' + [Guid]::NewGuid().ToString('N')
+          $email = $orderId.ToLowerInvariant() + '@example.com'
+          $payload = @{ OrderId = $orderId; CustomerEmail = $email; TotalAmount = 1 } | ConvertTo-Json -Compress
+          $url = "https://$($env:ORDER_API_NAME).azurewebsites.net/api/orders"
+          $response = Invoke-WebRequest -Uri $url -Method Post -Body $payload -ContentType 'application/json' -TimeoutSec 60
+          if ($response.StatusCode -ne 202) {
+              throw "OrderApi returned HTTP $($response.StatusCode) for $orderId. Expected 202."
           }
+          Write-Host "OrderApi accepted $orderId."
+
+          # Only the GUID-derived order ID and synthetic email are interpolated.
+          @"
+          SET NOCOUNT ON;
+          DECLARE @OrderId nvarchar(50) = N'$orderId';
+          DECLARE @Email nvarchar(256) = N'$email';
+          DECLARE @Deadline datetime2 = DATEADD(second, 120, SYSUTCDATETIME());
+
+          IF OBJECT_ID(N'dbo.Customers', N'U') IS NOT NULL
+              EXEC sys.sp_executesql
+                  N'IF EXISTS (SELECT 1 FROM dbo.Customers WHERE Email = @Email)
+                      THROW 51000, ''The smoke order email already exists in Customers.'', 1;',
+                  N'@Email nvarchar(256)', @Email;
+
+          WHILE NOT EXISTS (
+              SELECT 1 FROM dbo.Orders WHERE OrderId = @OrderId AND CustomerEmail = @Email
+          )
+          BEGIN
+              IF SYSUTCDATETIME() >= @Deadline
+              BEGIN
+                  DECLARE @Error nvarchar(2048) = CONCAT(N'Guest order missing from dbo.Orders: ', @OrderId);
+                  THROW 51001, @Error, 1;
+              END;
+              WAITFOR DELAY '00:00:05';
+          END;
+
+          SELECT @OrderId AS PersistedGuestOrderId;
+          "@ | Set-Content -LiteralPath ./verify-guest-order.sql
+
+      - name: Verify the guest order in Azure SQL
+        uses: azure/sql-action@v2.4
+        with:
+          connection-string: ${{ secrets.CATALOG_SQL_CONNECTION_STRING }}
+          path: ./verify-guest-order.sql
+          arguments: -b -t 150
