@@ -22,7 +22,7 @@ public class CatalogDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<ProductCategory>().HasKey(pc => new {pc.ProductId, pc.CategoryId});
+        modelBuilder.Entity<ProductCategory>().HasKey(pc => new { pc.ProductId, pc.CategoryId });
 
         modelBuilder.Entity<ProductCategory>()
         .HasOne(pc => pc.Product)
@@ -45,7 +45,23 @@ public class CatalogDbContext : DbContext
         .HasIndex(p => p.SKU)
         .IsUnique();
 
+        modelBuilder.Entity<Order>(order =>
+{
+    order.Property(o => o.OrderId).HasMaxLength(50);
+    order.Property(o => o.CustomerEmail).HasMaxLength(256).IsRequired();
+    order.Property(o => o.TotalAmount).HasPrecision(18, 2);
+    order.Property(o => o.IntegrationStatus)
+        .HasMaxLength(50)
+        .IsRequired()
+        .HasDefaultValue("Queued");
+    order.Property(o => o.CreatedAt)
+        .HasPrecision(7)
+        .IsRequired()
+        .HasDefaultValueSql("GETUTCDATE()");
+});
+
+
 
     }
-    
+
 }
